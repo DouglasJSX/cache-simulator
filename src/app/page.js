@@ -1,101 +1,305 @@
-import Image from "next/image";
+// src/app/page.jsx
+"use client";
 
-export default function Home() {
+import React from "react";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import {
+  Play,
+  BarChart3,
+  Settings,
+  FileText,
+  Cpu,
+  Zap,
+  Target,
+  Timer,
+} from "lucide-react";
+
+export default function HomePage() {
+  const features = [
+    {
+      icon: <Cpu className="w-8 h-8 text-blue-600" />,
+      title: "Simulação Completa",
+      description:
+        "Simule cache associativa por conjunto com configurações personalizáveis",
+    },
+    {
+      icon: <Target className="w-8 h-8 text-green-600" />,
+      title: "Múltiplas Políticas",
+      description: "Write-through, write-back, LRU e substituição aleatória",
+    },
+    {
+      icon: <BarChart3 className="w-8 h-8 text-purple-600" />,
+      title: "Análises Automatizadas",
+      description: "Execute experimentos conforme especificado no TDE 2",
+    },
+    {
+      icon: <Timer className="w-8 h-8 text-orange-600" />,
+      title: "Visualização em Tempo Real",
+      description: "Veja o estado da cache e estatísticas durante a simulação",
+    },
+  ];
+
+  const experiments = [
+    {
+      title: "Impacto do Tamanho da Cache",
+      description: "Analise como diferentes tamanhos afetam a taxa de acerto",
+      config: "128 bytes/linha • Write-through • LRU • 4-way",
+    },
+    {
+      title: "Impacto do Tamanho do Bloco",
+      description:
+        "Estude a localidade espacial com diferentes tamanhos de bloco",
+      config: "8KB cache • Write-through • LRU • 2-way",
+    },
+    {
+      title: "Impacto da Associatividade",
+      description: "Compare diferentes níveis de associatividade",
+      config: "128 bytes/linha • Write-back • LRU • 8KB cache",
+    },
+    {
+      title: "Políticas de Substituição",
+      description: "Compare LRU vs substituição aleatória",
+      config: "128 bytes/linha • Write-through • 4-way",
+    },
+    {
+      title: "Largura de Banda da Memória",
+      description: "Analise tráfego entre write-through e write-back",
+      config: "Múltiplas configurações • LRU",
+    },
+  ];
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto p-6 space-y-12">
+        {/* Hero Section */}
+        <div className="text-center space-y-6 py-12">
+          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
+            <Zap className="w-4 h-4" />
+            TDE 2 - Fundamentos de Arquitetura de Computadores
+          </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <h1 className="text-5xl font-bold text-gray-900">
+            Simulador de <span className="text-blue-600">Memória Cache</span>
+          </h1>
+
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Explore o comportamento de diferentes configurações de cache através
+            de simulações interativas e análises automatizadas baseadas nos
+            conceitos da arquitetura Z70.
+          </p>
+
+          <div className="flex justify-center gap-4">
+            <Link href="/simulator">
+              <Button size="lg" className="px-8">
+                <Play className="w-5 h-5 mr-2" />
+                Iniciar Simulação
+              </Button>
+            </Link>
+
+            <Link href="/analysis">
+              <Button variant="outline" size="lg" className="px-8">
+                <BarChart3 className="w-5 h-5 mr-2" />
+                Ver Análises
+              </Button>
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, index) => (
+            <Card
+              key={index}
+              className="text-center p-6 hover:shadow-lg transition-shadow"
+            >
+              <CardContent className="space-y-4">
+                <div className="flex justify-center">{feature.icon}</div>
+                <h3 className="font-semibold text-lg">{feature.title}</h3>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Quick Start */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Simulator Preview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Simulador Interativo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-gray-600">
+                Configure parâmetros da cache e execute acessos individuais ou
+                carregue arquivos de trace para análise completa.
+              </p>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Políticas de Escrita:</span>
+                  <span>Write-through, Write-back</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Substituição:</span>
+                  <span>LRU, Aleatória</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Associatividade:</span>
+                  <span>1-way até 64-way</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Tamanho do Bloco:</span>
+                  <span>8B até 4KB</span>
+                </div>
+              </div>
+
+              <Link href="/simulator">
+                <Button className="w-full mt-4">
+                  <Play className="w-4 h-4 mr-2" />
+                  Abrir Simulador
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Analysis Preview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Análises Automatizadas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-gray-600">
+                Execute os experimentos especificados no TDE 2 automaticamente e
+                gere gráficos e relatórios detalhados.
+              </p>
+
+              <div className="space-y-2">
+                {[
+                  "Tamanho da Cache",
+                  "Tamanho do Bloco",
+                  "Associatividade",
+                  "Política de Substituição",
+                ].map((analysis, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    <span>{analysis}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Link href="/analysis">
+                <Button variant="outline" className="w-full mt-4">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Ver Análises
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Experiments Overview */}
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Experimentos do TDE 2
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {experiments.map((experiment, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg">
+                      {experiment.title}
+                    </CardTitle>
+                    <Badge variant="secondary">{index + 1}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-gray-600 text-sm">
+                    {experiment.description}
+                  </p>
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    <strong>Configuração:</strong> {experiment.config}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Getting Started */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Como Começar
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-3">
+                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                  1
+                </div>
+                <h3 className="font-semibold">Configure a Cache</h3>
+                <p className="text-sm text-gray-600">
+                  Defina tamanho da linha, número de linhas, associatividade e
+                  políticas de escrita e substituição.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                  2
+                </div>
+                <h3 className="font-semibold">Carregue os Dados</h3>
+                <p className="text-sm text-gray-600">
+                  Use arquivos de trace (teste.cache ou oficial.cache) ou insira
+                  endereços manualmente.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                  3
+                </div>
+                <h3 className="font-semibold">Analise Resultados</h3>
+                <p className="text-sm text-gray-600">
+                  Visualize estatísticas, gráficos e exporte relatórios
+                  detalhados para seu TDE.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <div className="text-center py-8 border-t">
+          <p className="text-gray-600">
+            Desenvolvido para a disciplina{" "}
+            <strong>
+              FBI4019 - Fundamentos de Arquitetura de Computadores
+            </strong>
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            Baseado na Arquitetura Hipotética Z70 e especificações do TDE 2
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
