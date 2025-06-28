@@ -1,4 +1,3 @@
-// src/core/cache/AddressDecoder.js
 import { createAddressComponents } from "../types/cache.types.js";
 
 export class AddressDecoder {

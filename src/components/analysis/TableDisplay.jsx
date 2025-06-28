@@ -1,18 +1,16 @@
-// src/components/analysis/TableDisplay.jsx
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
+import { ChevronUp, ChevronDown, Search, Eye } from "lucide-react";
 import {
-  ChevronUp,
-  ChevronDown,
-  Download,
-  Search,
-  Filter,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+  formatToFourDecimals,
+  formatPercentage,
+  formatTime,
+  formatInteger,
+  formatBytes,
+  isValidNumber,
+} from "../../core/utils/formatters.js";
 
 export function TableDisplay({
   data = [],
@@ -54,16 +52,66 @@ export function TableDisplay({
     : data;
 
   // Ordenação
+  const extractNumericValue = (value) => {
+    if (typeof value === "number") {
+      return value;
+    }
+
+    if (typeof value === "string") {
+      const cleanValue = value.toString().toLowerCase().trim();
+      const numericMatch = cleanValue.match(/^(\d+(?:\.\d+)?)/);
+
+      if (numericMatch) {
+        const number = parseFloat(numericMatch[1]);
+
+        if (cleanValue.includes("kb")) {
+          return number * 1024;
+        } else if (cleanValue.includes("mb")) {
+          return number * 1024 * 1024;
+        } else if (cleanValue.includes("gb")) {
+          return number * 1024 * 1024 * 1024;
+        } else if (cleanValue.includes("tb")) {
+          return number * 1024 * 1024 * 1024 * 1024;
+        } else if (cleanValue.includes("b") && !cleanValue.includes("kb")) {
+          return number;
+        } else if (cleanValue.includes("%")) {
+          return number;
+        } else if (cleanValue.includes("ns")) {
+          return number;
+        } else if (cleanValue.includes("ms")) {
+          return number * 1000000;
+        } else if (
+          cleanValue.includes("s") &&
+          !cleanValue.includes("ns") &&
+          !cleanValue.includes("ms")
+        ) {
+          return number * 1000000000;
+        }
+
+        return number;
+      }
+    }
+
+    return 0;
+  };
+
   const sortedData =
     sortable && sortConfig.key
       ? [...filteredData].sort((a, b) => {
           const aValue = a[sortConfig.key];
           const bValue = b[sortConfig.key];
 
-          if (typeof aValue === "number" && typeof bValue === "number") {
+          const aNumeric = extractNumericValue(aValue);
+          const bNumeric = extractNumericValue(bValue);
+
+          if (
+            aNumeric !== 0 ||
+            bNumeric !== 0 ||
+            (typeof aValue === "number" && typeof bValue === "number")
+          ) {
             return sortConfig.direction === "asc"
-              ? aValue - bValue
-              : bValue - aValue;
+              ? aNumeric - bNumeric
+              : bNumeric - aNumeric;
           }
 
           const aStr = aValue.toString().toLowerCase();
@@ -94,50 +142,53 @@ export function TableDisplay({
     }));
   };
 
-  const exportToCSV = () => {
-    const visibleCols = columns.filter((col) => visibleColumns[col.key]);
-    const headers = visibleCols.map((col) => col.label).join(",");
-
-    const rows = sortedData.map((row) =>
-      visibleCols
-        .map((col) => {
-          const value = row[col.key];
-          // Escape CSV values
-          if (
-            typeof value === "string" &&
-            (value.includes(",") || value.includes('"'))
-          ) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        })
-        .join(",")
-    );
-
-    const csvContent = [headers, ...rows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${title.replace(/\s+/g, "_")}_${Date.now()}.csv`;
-    link.click();
-  };
-
   const formatCellValue = (value, column) => {
     if (column.formatter) {
       return column.formatter(value);
     }
 
+    if (!isValidNumber(value) && typeof value !== "string") {
+      return value;
+    }
+
     if (typeof value === "number") {
       if (column.key.includes("Rate") || column.key.includes("Percentage")) {
-        return `${value.toFixed(2)}%`;
+        return formatPercentage(value); // 4 casas decimais
       }
       if (column.key.includes("Time")) {
-        return `${value.toFixed(2)}ns`;
+        return formatTime(value); // 4 casas decimais
       }
-      if (column.key.includes("Size") || column.key.includes("Cache")) {
-        return value >= 1024 ? `${(value / 1024).toFixed(1)}KB` : `${value}B`;
+      if (
+        column.key.includes("Size") ||
+        column.key.includes("Cache") ||
+        column.key.includes("Block") ||
+        column.key.includes("Line") ||
+        column.key.includes("Byte") ||
+        column.key.includes("Tamanho") ||
+        column.label?.includes("Tamanho") ||
+        column.label?.includes("Cache") ||
+        column.label?.includes("KB") ||
+        column.label?.includes("MB")
+      ) {
+        return formatBytes(value); // SEM decimais -> 2KB, 4KB, 16KB
       }
-      return value.toLocaleString();
+      if (
+        column.key.includes("Reads") ||
+        column.key.includes("Writes") ||
+        column.key.includes("Accesses") ||
+        column.key.includes("Hits") ||
+        column.key.includes("Misses") ||
+        column.key.includes("Lines") ||
+        column.key.includes("Count") ||
+        column.key.includes("total") ||
+        column.key.includes("Total") ||
+        column.key.includes("Number") ||
+        column.key.includes("Blocks")
+      ) {
+        return formatInteger(value); // SEM decimais
+      }
+      // Para outros números reais, 4 casas decimais
+      return formatToFourDecimals(value);
     }
 
     return value;
@@ -161,7 +212,7 @@ export function TableDisplay({
   return (
     <Card className={className}>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row gap-2 md:gap-0 justify-between items-center">
           <CardTitle>{title}</CardTitle>
           <div className="flex gap-2">
             {/* Column visibility toggle */}
@@ -187,13 +238,6 @@ export function TableDisplay({
                 ))}
               </div>
             </div>
-
-            {exportable && (
-              <Button variant="outline" size="sm" onClick={exportToCSV}>
-                <Download className="w-4 h-4 mr-1" />
-                CSV
-              </Button>
-            )}
           </div>
         </div>
 
@@ -279,14 +323,14 @@ export function TableDisplay({
         </div>
 
         {/* Summary */}
-        <div className="mt-4 pt-4 border-t flex justify-between items-center text-sm text-gray-600">
+        <div className="mt-4 pt-4 border-t flex flex-col md:flex-row gap-4 md:gap-0 justify-between items-center text-sm text-gray-600">
           <div>
             Mostrando {sortedData.length} de {data.length} resultados
             {searchTerm && ` (filtrado por "${searchTerm}")`}
           </div>
 
           {sortedData.length > 0 && (
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row justify-center items-center gap-4">
               {columns
                 .filter(
                   (col) =>
@@ -297,8 +341,6 @@ export function TableDisplay({
                   const values = sortedData.map((row) => row[column.key]);
                   const avg =
                     values.reduce((sum, val) => sum + val, 0) / values.length;
-                  const max = Math.max(...values);
-                  const min = Math.min(...values);
 
                   return (
                     <div key={column.key} className="text-center">

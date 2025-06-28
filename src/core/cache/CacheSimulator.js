@@ -1,4 +1,3 @@
-// src/core/cache/CacheSimulator.js
 import { CacheLine } from "./CacheLine.js";
 import { AddressDecoder } from "./AddressDecoder.js";
 import {
@@ -11,6 +10,13 @@ import {
   createCacheAccessResult,
   createSimulationStatistics,
 } from "../types/cache.types.js";
+import {
+  formatToFourDecimals,
+  formatPercentage,
+  formatTime,
+  formatInteger,
+  isValidNumber,
+} from "../utils/formatters.js";
 
 export class CacheSimulator {
   constructor(cacheConfig, memoryConfig) {
@@ -132,25 +138,53 @@ export class CacheSimulator {
   calculateFinalStatistics() {
     const { stats, config, memConfig } = this;
 
+    // Calcula taxas de acerto como NÚMEROS REAIS (4 casas decimais)
     stats.hitRate =
-      stats.totalAccesses > 0 ? (stats.hits / stats.totalAccesses) * 100 : 0;
+      stats.totalAccesses > 0
+        ? parseFloat(
+            formatToFourDecimals((stats.hits / stats.totalAccesses) * 100)
+          )
+        : parseFloat(formatToFourDecimals(0));
 
     stats.readHitRate =
-      stats.readAccesses > 0 ? (stats.readHits / stats.readAccesses) * 100 : 0;
+      stats.readAccesses > 0
+        ? parseFloat(
+            formatToFourDecimals((stats.readHits / stats.readAccesses) * 100)
+          )
+        : parseFloat(formatToFourDecimals(0));
 
     stats.writeHitRate =
       stats.writeAccesses > 0
-        ? (stats.writeHits / stats.writeAccesses) * 100
-        : 0;
+        ? parseFloat(
+            formatToFourDecimals((stats.writeHits / stats.writeAccesses) * 100)
+          )
+        : parseFloat(formatToFourDecimals(0));
 
-    // Tempo médio de acesso
+    // Tempo médio de acesso como NÚMERO REAL (4 casas decimais)
     const hitTime = config.hitTime;
-    const missTime = hitTime + memConfig.readTime;
 
     stats.averageAccessTime =
       stats.totalAccesses > 0
-        ? hitTime + (stats.misses / stats.totalAccesses) * memConfig.readTime
-        : 0;
+        ? parseFloat(
+            formatToFourDecimals(
+              hitTime +
+                (stats.misses / stats.totalAccesses) * memConfig.readTime
+            )
+          )
+        : parseFloat(formatToFourDecimals(0));
+
+    // Garantir que contadores sejam INTEIROS (sem decimais)
+    stats.totalAccesses = parseInt(stats.totalAccesses) || 0;
+    stats.readAccesses = parseInt(stats.readAccesses) || 0;
+    stats.writeAccesses = parseInt(stats.writeAccesses) || 0;
+    stats.hits = parseInt(stats.hits) || 0;
+    stats.misses = parseInt(stats.misses) || 0;
+    stats.readHits = parseInt(stats.readHits) || 0;
+    stats.readMisses = parseInt(stats.readMisses) || 0;
+    stats.writeHits = parseInt(stats.writeHits) || 0;
+    stats.writeMisses = parseInt(stats.writeMisses) || 0;
+    stats.memoryReads = parseInt(stats.memoryReads) || 0;
+    stats.memoryWrites = parseInt(stats.memoryWrites) || 0;
   }
 
   getResults() {

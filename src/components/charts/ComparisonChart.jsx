@@ -1,4 +1,3 @@
-// src/components/charts/ComparisonChart.jsx
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
@@ -13,6 +12,11 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import {
+  formatToFourDecimals,
+  formatPercentage,
+  isValidNumber,
+} from "../../core/utils/formatters.js";
 
 export function ComparisonChart({
   datasets = [],
@@ -38,29 +42,28 @@ export function ComparisonChart({
     );
   }
 
-  // Cores para diferentes séries
   const colors = [
-    "#2563eb", // blue
-    "#dc2626", // red
-    "#16a34a", // green
-    "#ca8a04", // yellow
-    "#9333ea", // purple
-    "#c2410c", // orange
+    "#2563eb",
+    "#dc2626",
+    "#16a34a",
+    "#ca8a04",
+    "#9333ea",
+    "#c2410c",
   ];
 
-  // Combina datasets em um formato único para o gráfico
   const chartData = datasets[0].data.map((_, index) => {
     const point = { x: datasets[0].data[index].x };
 
     datasets.forEach((dataset, datasetIndex) => {
       const dataPoint = dataset.data[index];
-      point[dataset.name] = Number(dataPoint.y.toFixed(2));
+      point[dataset.name] = isValidNumber(dataPoint.y)
+        ? parseFloat(formatToFourDecimals(dataPoint.y))
+        : parseFloat(formatToFourDecimals(0));
     });
 
-    // Calcula diferença entre primeira e segunda série se aplicável
     if (showDifference && datasets.length >= 2) {
       const diff = point[datasets[0].name] - point[datasets[1].name];
-      point.difference = Number(diff.toFixed(2));
+      point.difference = parseFloat(formatToFourDecimals(diff));
     }
 
     return point;
@@ -73,7 +76,7 @@ export function ComparisonChart({
           <p className="font-medium">{`${xAxisLabel}: ${label}`}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }}>
-              {`${entry.dataKey}: ${entry.value}%`}
+              {`${entry.dataKey}: ${formatPercentage(entry.value)}`}
             </p>
           ))}
           {showDifference && payload[0]?.payload?.difference !== undefined && (
@@ -85,7 +88,7 @@ export function ComparisonChart({
               }`}
             >
               Diferença: {payload[0].payload.difference >= 0 ? "+" : ""}
-              {payload[0].payload.difference}%
+              {formatPercentage(Math.abs(payload[0].payload.difference))}
             </p>
           )}
         </div>
@@ -154,7 +157,7 @@ export function ComparisonChart({
                   className="text-xs"
                 />
                 <YAxis
-                  tickFormatter={(value) => `${value}%`}
+                  tickFormatter={(value) => formatPercentage(value)}
                   domain={[0, 100]}
                   className="text-xs"
                 />
@@ -181,7 +184,7 @@ export function ComparisonChart({
                   className="text-xs"
                 />
                 <YAxis
-                  tickFormatter={(value) => `${value}%`}
+                  tickFormatter={(value) => formatPercentage(value)}
                   domain={[0, 100]}
                   className="text-xs"
                 />
@@ -254,7 +257,7 @@ export function ComparisonChart({
                     }`}
                   >
                     {point.difference >= 0 ? "+" : ""}
-                    {point.difference}%
+                    {formatPercentage(Math.abs(point.difference))}
                   </div>
                 </div>
               ))}

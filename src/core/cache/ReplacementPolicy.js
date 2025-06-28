@@ -1,4 +1,3 @@
-// src/core/cache/ReplacementPolicy.js
 import { ReplacementPolicy } from "../types/cache.types.js";
 
 export class LRUReplacementPolicy {

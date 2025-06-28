@@ -1,4 +1,3 @@
-// src/components/simulator/CacheVisualizer.jsx
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
@@ -31,7 +30,6 @@ export function CacheVisualizer({
   const getCellColor = (line, setIndex, lineIndex) => {
     if (!line.valid) return "bg-gray-100 border-gray-200";
 
-    // Destaca último acesso
     if (
       lastAccess &&
       lastAccess.setIndex === setIndex &&

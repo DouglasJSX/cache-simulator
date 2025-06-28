@@ -1,4 +1,3 @@
-// src/app/page.jsx
 "use client";
 
 import React from "react";
@@ -96,7 +95,7 @@ export default function HomePage() {
             conceitos da arquitetura Z70.
           </p>
 
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4">
             <Link href="/simulator">
               <Button size="lg" className="px-8">
                 <Play className="w-5 h-5 mr-2" />
@@ -288,7 +287,7 @@ export default function HomePage() {
         </Card>
 
         {/* Footer */}
-        <div className="text-center py-8 border-t">
+        <div className="text-center py-8 border-t flex flex-col items-center justify-center">
           <p className="text-gray-600">
             Desenvolvido para a disciplina{" "}
             <strong>
@@ -298,6 +297,16 @@ export default function HomePage() {
           <p className="text-sm text-gray-500 mt-2">
             Baseado na Arquitetura Hipotética Z70 e especificações do TDE 2
           </p>
+          <div className="text-center text-sm text-gray-500 mt-4 flex flex-col md:flex-row md:gap-2">
+            Desenvolvido por{" "}
+            <p className="text-gray-600 font-bold hover:text-gray-700 duration-300">
+              Douglas Marcon Zamboni
+            </p>{" "}
+            e{" "}
+            <p className="text-gray-600 font-bold hover:text-gray-700 duration-300">
+              Johan David Cedeno Gonzalez
+            </p>
+          </div>
         </div>
       </div>
     </div>

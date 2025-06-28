@@ -1,5 +1,3 @@
-// src/core/types/cache.types.js
-
 // Enums para políticas e operações
 export const WritePolicy = {
   WRITE_THROUGH: 0,
@@ -300,14 +298,14 @@ export const calculateCacheSize = (numLines, lineSize) => numLines * lineSize;
 export const calculateNumSets = (numLines, associativity) =>
   numLines / associativity;
 export const formatBytes = (bytes) => {
-  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
-  if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+  if (bytes >= 1024 * 1024) return `${bytes / (1024 * 1024)}MB`;
+  if (bytes >= 1024) return `${bytes / 1024}KB`;
   return `${bytes}B`;
 };
 
 export const formatTime = (ns) => {
-  if (ns >= 1000) return `${(ns / 1000).toFixed(2)}μs`;
-  return `${ns.toFixed(2)}ns`;
+  if (ns >= 1000) return `${(ns / 1000).toFixed(4)}μs`;
+  return `${ns.toFixed(4)}ns`;
 };
 
 export const formatPercentage = (value, decimals = 2) => {

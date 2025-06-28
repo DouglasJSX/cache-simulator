@@ -1,4 +1,3 @@
-// src/core/cache/CacheLine.js
 import { createCacheLineData } from "../types/cache.types.js";
 
 export class CacheLine {

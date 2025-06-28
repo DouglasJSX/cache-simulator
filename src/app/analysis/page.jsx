@@ -1,4 +1,3 @@
-// src/app/analysis/page.jsx
 "use client";
 
 import React, { useState } from "react";
@@ -21,7 +20,6 @@ import { BlockSizeChart } from "../../components/charts/BlockSizeChart";
 import { AssociativityChart } from "../../components/charts/AssociativityChart";
 import { ComparisonChart } from "../../components/charts/ComparisonChart";
 import { TableDisplay } from "../../components/analysis/TableDisplay";
-import { ReportGenerator } from "../../components/analysis/ReportGenerator";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { useSimulation } from "../../hooks/useSimulation";
 import {
@@ -31,18 +29,16 @@ import {
   ReplacementPolicy,
 } from "../../core/types/cache.types";
 import { StatisticsCalculator } from "../../core/utils/statistics";
-import { Play, Download, Upload } from "lucide-react";
+import { Play, Upload } from "lucide-react";
 
 export default function AnalysisPage() {
   const {
-    experiments,
     isRunning,
     progress,
     traceData,
     loadTraceFile,
     runBatchExperiments,
     clearExperiments,
-    exportResults,
   } = useSimulation();
 
   const [activeAnalysis, setActiveAnalysis] = useState("cache-size");
@@ -422,7 +418,7 @@ export default function AnalysisPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row gap-5 w-full justify-between items-center text-center md:text-start">
         <div>
           <h1 className="text-3xl font-bold">Análises de Cache</h1>
           <p className="text-gray-600">
@@ -443,7 +439,7 @@ export default function AnalysisPage() {
           <CardTitle>Arquivo de Trace</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row items-center gap-4">
             <div className="flex-1">
               <input
                 type="file"
@@ -499,7 +495,7 @@ export default function AnalysisPage() {
 
       {/* Analysis Tabs */}
       <Tabs value={activeAnalysis} onValueChange={setActiveAnalysis}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full h-full grid-cols-1 md:grid-cols-5 gap-3 md:gap-0">
           <TabsTrigger value="cache-size">Tamanho Cache</TabsTrigger>
           <TabsTrigger value="block-size">Tamanho Bloco</TabsTrigger>
           <TabsTrigger value="associativity">Associatividade</TabsTrigger>
@@ -507,7 +503,7 @@ export default function AnalysisPage() {
           <TabsTrigger value="bandwidth">Largura Banda</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="cache-size" className="space-y-4">
+        <TabsContent value="cache-size" className="h-full space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Impacto do Tamanho da Cache</CardTitle>
@@ -535,10 +531,10 @@ export default function AnalysisPage() {
 
                   <TableDisplay
                     data={analysisResults.cacheSize.results.map((r) => ({
-                      cacheSize: `${(
+                      cacheSize: `${
                         (r.configuration.numLines * r.configuration.lineSize) /
                         1024
-                      ).toFixed(1)}KB`,
+                      }KB`,
                       hitRate: r.statistics.hitRate,
                       avgAccessTime: r.statistics.averageAccessTime,
                       memoryReads: r.statistics.memoryReads,
@@ -700,11 +696,11 @@ export default function AnalysisPage() {
                     <TableDisplay
                       data={analysisResults.replacementPolicy.lruResults.map(
                         (r) => ({
-                          cacheSize: `${(
+                          cacheSize: `${
                             (r.configuration.numLines *
                               r.configuration.lineSize) /
                             1024
-                          ).toFixed(1)}KB`,
+                          }KB`,
                           hitRate: r.statistics.hitRate,
                           avgAccessTime: r.statistics.averageAccessTime,
                         })
@@ -720,11 +716,11 @@ export default function AnalysisPage() {
                     <TableDisplay
                       data={analysisResults.replacementPolicy.randomResults.map(
                         (r) => ({
-                          cacheSize: `${(
+                          cacheSize: `${
                             (r.configuration.numLines *
                               r.configuration.lineSize) /
                             1024
-                          ).toFixed(1)}KB`,
+                          }KB`,
                           hitRate: r.statistics.hitRate,
                           avgAccessTime: r.statistics.averageAccessTime,
                         })
@@ -844,18 +840,6 @@ export default function AnalysisPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Gerador de Relatório */}
-      {Object.keys(analysisResults).length > 0 && (
-        <div className="mt-8">
-          <ReportGenerator
-            experimentResults={analysisResults}
-            onExport={(markdown) => {
-              console.log("Relatório gerado:", markdown);
-            }}
-          />
-        </div>
-      )}
     </div>
   );
 }

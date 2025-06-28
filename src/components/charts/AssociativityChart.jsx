@@ -1,4 +1,3 @@
-// src/components/charts/AssociativityChart.jsx
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
@@ -12,6 +11,11 @@ import {
   LineChart,
   Line,
 } from "recharts";
+import {
+  formatToFourDecimals,
+  formatPercentage,
+  isValidNumber,
+} from "../../core/utils/formatters.js";
 
 export function AssociativityChart({
   data = [],
@@ -37,7 +41,9 @@ export function AssociativityChart({
   // Formata dados para o gráfico
   const chartData = data.map((point) => ({
     associativity: point.x,
-    hitRate: Number(point.y.toFixed(2)),
+    hitRate: isValidNumber(point.y)
+      ? parseFloat(formatToFourDecimals(point.y))
+      : parseFloat(formatToFourDecimals(0)),
     label: point.x === 1 ? "Direct" : `${point.x}-way`,
     conflictMisses: point.metadata?.conflictMisses || 0,
   }));
@@ -56,10 +62,12 @@ export function AssociativityChart({
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-medium">{`Associatividade: ${data.label}`}</p>
-          <p className="text-blue-600">{`Taxa de Acerto: ${payload[0].value}%`}</p>
+          <p className="text-blue-600">{`Taxa de Acerto: ${formatPercentage(
+            payload[0].value
+          )}`}</p>
           {data.improvement !== undefined && data.improvement > 0 && (
             <p className="text-green-600 text-sm">
-              +{data.improvement.toFixed(2)}% vs anterior
+              +{formatPercentage(data.improvement)} vs anterior
             </p>
           )}
         </div>
@@ -108,7 +116,7 @@ export function AssociativityChart({
                   className="text-xs"
                 />
                 <YAxis
-                  tickFormatter={(value) => `${value}%`}
+                  tickFormatter={(value) => formatPercentage(value)}
                   domain={[0, 100]}
                   className="text-xs"
                 />
@@ -129,7 +137,7 @@ export function AssociativityChart({
                   domain={["dataMin", "dataMax"]}
                 />
                 <YAxis
-                  tickFormatter={(value) => `${value}%`}
+                  tickFormatter={(value) => formatPercentage(value)}
                   domain={[0, 100]}
                   className="text-xs"
                 />
@@ -152,14 +160,14 @@ export function AssociativityChart({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
             <div>
               <div className="font-medium text-gray-900">
-                {chartData[0]?.hitRate.toFixed(1)}%
+                {formatPercentage(chartData[0]?.hitRate)}
               </div>
               <div className="text-gray-500">Direct-Mapped</div>
             </div>
 
             <div>
               <div className="font-medium text-gray-900">
-                {chartData[chartData.length - 1]?.hitRate.toFixed(1)}%
+                {formatPercentage(chartData[chartData.length - 1]?.hitRate)}
               </div>
               <div className="text-gray-500">Fully Associative</div>
             </div>
@@ -174,11 +182,10 @@ export function AssociativityChart({
             <div>
               <div className="font-medium text-green-600">
                 +
-                {(
+                {formatPercentage(
                   chartData[chartData.length - 1]?.hitRate -
-                  chartData[0]?.hitRate
-                ).toFixed(1)}
-                %
+                    chartData[0]?.hitRate
+                )}
               </div>
               <div className="text-gray-500">Ganho Total</div>
             </div>
@@ -197,7 +204,7 @@ export function AssociativityChart({
                     item.improvement >= 2 ? "text-green-600" : "text-gray-500"
                   }`}
                 >
-                  +{item.improvement.toFixed(1)}%
+                  +{formatPercentage(item.improvement)}
                 </div>
               </div>
             ))}
@@ -212,10 +219,10 @@ export function AssociativityChart({
           <ul className="text-sm text-blue-800 space-y-1">
             <li>
               • Ganho total:{" "}
-              {(
+              {formatPercentage(
                 chartData[chartData.length - 1]?.hitRate - chartData[0]?.hitRate
-              ).toFixed(1)}
-              % de direct-mapped para fully associative
+              )}{" "}
+              de direct-mapped para fully associative
             </li>
             <li>
               • Ponto de diminishing returns:{" "}
@@ -223,10 +230,10 @@ export function AssociativityChart({
             </li>
             <li>
               • Maior melhoria individual:{" "}
-              {Math.max(
-                ...improvements.slice(1).map((i) => i.improvement)
-              ).toFixed(1)}
-              % (2-way vs direct)
+              {formatPercentage(
+                Math.max(...improvements.slice(1).map((i) => i.improvement))
+              )}{" "}
+              (2-way vs direct)
             </li>
             <li>
               • Recomendação:{" "}

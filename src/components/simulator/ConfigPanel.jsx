@@ -1,4 +1,3 @@
-// src/components/simulator/ConfigPanel.jsx
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
@@ -16,6 +15,7 @@ import {
   WritePolicy,
   ReplacementPolicy,
 } from "../../core/types/cache.types.js";
+import { Badge } from "../ui/badge";
 
 export function ConfigPanel({
   config,
@@ -25,6 +25,7 @@ export function ConfigPanel({
   onReset,
   isValid,
   disabled = false,
+  hasLoadedData = false,
 }) {
   const handleCacheConfigChange = (field, value) => {
     const numValue =
@@ -49,7 +50,14 @@ export function ConfigPanel({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Configuração da Cache</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          Configuração da Cache
+          {hasLoadedData && (
+            <Badge variant="outline" className="text-green-600">
+              Auto-aplicação ativa
+            </Badge>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {!isValid.isValid && (
@@ -59,7 +67,7 @@ export function ConfigPanel({
         )}
 
         {/* Configurações da Cache */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="lineSize">Tamanho da Linha (bytes)</Label>
             <Select
@@ -189,8 +197,10 @@ export function ConfigPanel({
 
         {/* Configurações da Memória */}
         <div className="border-t pt-4">
-          <h4 className="font-medium mb-3">Configuração da Memória</h4>
-          <div className="grid grid-cols-2 gap-4">
+          <h4 className="font-semibold leading-none tracking-tight mb-4">
+            Configuração da Memória
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="readTime">Tempo de Leitura (ns)</Label>
               <Input
@@ -226,8 +236,7 @@ export function ConfigPanel({
           <h4 className="font-medium mb-2">Informações Calculadas</h4>
           <div className="text-sm text-gray-600 space-y-1">
             <p>
-              Tamanho Total:{" "}
-              {((config.numLines * config.lineSize) / 1024).toFixed(1)} KB
+              Tamanho Total: {(config.numLines * config.lineSize) / 1024} KB
             </p>
             <p>Número de Conjuntos: {config.numLines / config.associativity}</p>
             <p>Linhas por Conjunto: {config.associativity}</p>
