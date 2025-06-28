@@ -1,8 +1,16 @@
-// src/components/simulator/StatsDisplay.jsx
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
+import {
+  formatPercentage,
+  formatTime,
+  formatInteger,
+  formatBytes,
+  formatCacheSize,
+  formatAssociativity,
+  formatWritePolicy,
+} from "../../core/utils/formatters.js";
 
 export function StatsDisplay({ statistics, configuration, className = "" }) {
   if (!statistics) {
@@ -17,18 +25,6 @@ export function StatsDisplay({ statistics, configuration, className = "" }) {
       </Card>
     );
   }
-
-  const formatNumber = (num) => {
-    return new Intl.NumberFormat("pt-BR").format(num);
-  };
-
-  const formatPercentage = (num) => {
-    return `${num.toFixed(2)}%`;
-  };
-
-  const formatTime = (num) => {
-    return `${num.toFixed(4)} ns`;
-  };
 
   const getHitRateColor = (rate) => {
     if (rate >= 90) return "[&>div]:bg-green-500";
@@ -47,12 +43,12 @@ export function StatsDisplay({ statistics, configuration, className = "" }) {
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium">Taxa de Acerto Geral</span>
             <Badge variant="secondary">
-              {formatPercentage(statistics.hitRate)}
+              {formatPercentage(statistics.hitRate || 0)}
             </Badge>
           </div>
           <Progress
-            value={statistics.hitRate}
-            className={`h-2 ${getHitRateColor(statistics.hitRate)}`}
+            value={statistics.hitRate || 0}
+            className={`h-2 ${getHitRateColor(statistics.hitRate || 0)}`}
           />
         </div>
 
@@ -60,19 +56,19 @@ export function StatsDisplay({ statistics, configuration, className = "" }) {
         <div className="grid grid-cols-3 gap-4 text-center">
           <div className="p-3 bg-blue-50 rounded-lg">
             <div className="text-2xl font-bold text-blue-600">
-              {formatNumber(statistics.totalAccesses)}
+              {formatInteger(statistics.totalAccesses || 0)}
             </div>
             <div className="text-sm text-blue-600">Total</div>
           </div>
           <div className="p-3 bg-green-50 rounded-lg">
             <div className="text-2xl font-bold text-green-600">
-              {formatNumber(statistics.hits)}
+              {formatInteger(statistics.hits || 0)}
             </div>
             <div className="text-sm text-green-600">Hits</div>
           </div>
           <div className="p-3 bg-red-50 rounded-lg">
             <div className="text-2xl font-bold text-red-600">
-              {formatNumber(statistics.misses)}
+              {formatInteger(statistics.misses || 0)}
             </div>
             <div className="text-sm text-red-600">Misses</div>
           </div>
@@ -87,15 +83,15 @@ export function StatsDisplay({ statistics, configuration, className = "" }) {
             <div>
               <div className="font-medium">Leituras</div>
               <div className="text-sm text-gray-600">
-                {formatNumber(statistics.readAccesses)} acessos
+                {formatInteger(statistics.readAccesses || 0)} acessos
               </div>
             </div>
             <div className="text-right">
               <div className="font-medium">
-                {formatPercentage(statistics.readHitRate)}
+                {formatPercentage(statistics.readHitRate || 0)}
               </div>
               <div className="text-sm text-gray-600">
-                {formatNumber(statistics.readHits)} hits
+                {formatInteger(statistics.readHits || 0)} hits
               </div>
             </div>
           </div>
@@ -105,15 +101,15 @@ export function StatsDisplay({ statistics, configuration, className = "" }) {
             <div>
               <div className="font-medium">Escritas</div>
               <div className="text-sm text-gray-600">
-                {formatNumber(statistics.writeAccesses)} acessos
+                {formatInteger(statistics.writeAccesses || 0)} acessos
               </div>
             </div>
             <div className="text-right">
               <div className="font-medium">
-                {formatPercentage(statistics.writeHitRate)}
+                {formatPercentage(statistics.writeHitRate || 0)}
               </div>
               <div className="text-sm text-gray-600">
-                {formatNumber(statistics.writeHits)} hits
+                {formatInteger(statistics.writeHits || 0)} hits
               </div>
             </div>
           </div>
@@ -125,13 +121,13 @@ export function StatsDisplay({ statistics, configuration, className = "" }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-3 border rounded-lg">
               <div className="text-xl font-bold">
-                {formatNumber(statistics.memoryReads)}
+                {formatInteger(statistics.memoryReads || 0)}
               </div>
               <div className="text-sm text-gray-600">Leituras da MP</div>
             </div>
             <div className="text-center p-3 border rounded-lg">
               <div className="text-xl font-bold">
-                {formatNumber(statistics.memoryWrites)}
+                {formatInteger(statistics.memoryWrites || 0)}
               </div>
               <div className="text-sm text-gray-600">Escritas na MP</div>
             </div>
@@ -142,7 +138,7 @@ export function StatsDisplay({ statistics, configuration, className = "" }) {
         <div className="p-4 bg-blue-50 rounded-lg">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">
-              {formatTime(statistics.averageAccessTime)}
+              {formatTime(statistics.averageAccessTime || 0)}
             </div>
             <div className="text-sm text-blue-600">Tempo Médio de Acesso</div>
           </div>
@@ -155,19 +151,18 @@ export function StatsDisplay({ statistics, configuration, className = "" }) {
             <div className="text-sm text-gray-600 space-y-1">
               <div>
                 Cache:{" "}
-                {(
-                  (configuration.numLines * configuration.lineSize) /
-                  1024
-                ).toFixed(1)}{" "}
-                KB
+                {formatCacheSize(
+                  configuration.numLines,
+                  configuration.lineSize
+                )}
               </div>
-              <div>Linha: {configuration.lineSize} bytes</div>
-              <div>Associatividade: {configuration.associativity}-way</div>
+              <div>Linha: {formatBytes(configuration.lineSize)}</div>
               <div>
-                Política:{" "}
-                {configuration.writePolicy === 0
-                  ? "Write-Through"
-                  : "Write-Back"}
+                Associatividade:{" "}
+                {formatAssociativity(configuration.associativity)}
+              </div>
+              <div>
+                Política: {formatWritePolicy(configuration.writePolicy)}
               </div>
             </div>
           </div>

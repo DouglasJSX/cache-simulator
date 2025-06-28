@@ -1,14 +1,6 @@
-// src/hooks/useSimulation.js
 import { useState, useCallback } from "react";
 import { CacheSimulator } from "../core/cache/CacheSimulator.js";
 import { FileParser } from "../core/utils/fileParser.js";
-import { StatisticsCalculator } from "../core/utils/statistics.js";
-import {
-  createCacheConfiguration,
-  createMemoryConfiguration,
-  WritePolicy,
-  ReplacementPolicy,
-} from "../core/types/cache.types.js";
 
 export function useSimulation() {
   const [experiments, setExperiments] = useState([]);

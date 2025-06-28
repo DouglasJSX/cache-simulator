@@ -1,4 +1,3 @@
-// src/components/charts/HitRateChart.jsx
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
@@ -10,6 +9,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import {
+  formatToFourDecimals,
+  formatPercentage,
+  isValidNumber,
+} from "../../core/utils/formatters.js";
 
 export function HitRateChart({
   data = [],
@@ -33,10 +37,11 @@ export function HitRateChart({
     );
   }
 
-  // Formata dados para o gráfico
   const chartData = data.map((point) => ({
     x: point.x,
-    hitRate: typeof point.y === "number" ? Number(point.y.toFixed(2)) : 0,
+    hitRate: isValidNumber(point.y)
+      ? parseFloat(formatToFourDecimals(point.y))
+      : parseFloat(formatToFourDecimals(0)),
     label: point.label || point.x,
   }));
 
@@ -46,7 +51,7 @@ export function HitRateChart({
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-medium">{`${xAxisLabel}: ${label}`}</p>
           <p className="text-blue-600">
-            {`${yAxisLabel}: ${payload[0].value}%`}
+            {`${yAxisLabel}: ${formatPercentage(payload[0].value)}`}
           </p>
         </div>
       );
@@ -54,12 +59,12 @@ export function HitRateChart({
     return null;
   };
 
-  const formatYAxisTick = (value) => `${value}%`;
+  const formatYAxisTick = (value) => formatPercentage(value);
 
   const formatXAxisTick = (value) => {
-    // Se for um número grande, formata adequadamente
     if (typeof value === "number" && value >= 1024) {
-      return `${(value / 1024).toFixed(0)}K`;
+      console.log(`${Math.round(value / 1024)}M`);
+      return `${Math.round(value / 1024)}M`;
     }
     return value.toString();
   };
@@ -107,26 +112,25 @@ export function HitRateChart({
 
         {/* Estatísticas do gráfico */}
         <div className="mt-4 pt-4 border-t">
-          <div className="grid grid-cols-3 gap-4 text-center text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center text-sm">
             <div>
               <div className="font-medium text-gray-900">
-                {Math.max(...chartData.map((d) => d.hitRate)).toFixed(1)}%
+                {formatPercentage(Math.max(...chartData.map((d) => d.hitRate)))}
               </div>
               <div className="text-gray-500">Máximo</div>
             </div>
             <div>
               <div className="font-medium text-gray-900">
-                {Math.min(...chartData.map((d) => d.hitRate)).toFixed(1)}%
+                {formatPercentage(Math.min(...chartData.map((d) => d.hitRate)))}
               </div>
               <div className="text-gray-500">Mínimo</div>
             </div>
             <div>
               <div className="font-medium text-gray-900">
-                {(
+                {formatPercentage(
                   chartData.reduce((sum, d) => sum + d.hitRate, 0) /
-                  chartData.length
-                ).toFixed(1)}
-                %
+                    chartData.length
+                )}
               </div>
               <div className="text-gray-500">Média</div>
             </div>

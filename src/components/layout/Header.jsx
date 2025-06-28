@@ -1,4 +1,3 @@
-// src/components/layout/Header.jsx
 "use client";
 
 import React from "react";
@@ -73,7 +72,7 @@ export function Header() {
             {/* GitHub Link */}
             <Button variant="outline" size="sm" asChild>
               <a
-                href="https://github.com"
+                href="https://github.com/DouglasJSX/cache-simulator"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub Repository"
